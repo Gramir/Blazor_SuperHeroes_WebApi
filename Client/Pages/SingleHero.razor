@@ -1,0 +1,33 @@
+﻿@page "/singlehero/{id:int}"
+@inject IHeroService HeroService
+
+@if (hero == null)
+{
+
+    <h3>Loading....</h3>
+
+}
+else
+{
+
+
+<h1>@hero.Name</h1>
+<h2>@hero.Comic.Name</h2>
+
+}
+
+@code {
+
+    Hero hero = null;
+
+    [Parameter]
+    public int id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        hero = await HeroService.GetHero(id);
+
+    }
+
+
+}

@@ -1,0 +1,83 @@
+﻿@page "/heroes"
+@inject IHeroService HeroService
+@inject NavigationManager Nav
+@implements IDisposable
+
+<h3>Heroes</h3>
+
+@if (HeroService.Heroes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Comic</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hero in HeroService.Heroes)
+            {
+            <tr>
+                <td>@hero.Name</td>
+                <td>@hero.Comic.Name</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => Details(hero.Id))">Details</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => Edit(hero.Id))">Edit</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => Delete(hero.Id))">Delete</button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+  
+}
+<button class="btn btn-primary" @onclick="Create">Create new hero</button> <br />
+<EditHero hero="Edithero"></EditHero>
+
+@code {
+
+    public Hero Edithero { get; set; } = new Hero();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await HeroService.GetHeroes();
+        HeroService.OnChange += StateHasChanged;
+    }
+
+    void Details(int id)
+    {
+        Nav.NavigateTo($"/singlehero/{id}");
+    }
+
+    void Edit(int id)
+    {
+        Edithero = HeroService.Heroes.FirstOrDefault(h => h.Id == id);
+    }
+
+    void Create()
+    {
+        Edithero = new Hero();
+    }
+
+    void Delete(int id)
+    {
+        HeroService.DeleteHero(id);
+    }
+
+    public void Dispose()
+    {
+        HeroService.OnChange -= StateHasChanged;
+    }
+}
